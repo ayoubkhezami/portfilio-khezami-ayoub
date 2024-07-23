@@ -58,19 +58,17 @@
       </div>
     </div> 
   </template>
-  
   <script setup>
-  import { ref } from 'vue';
-  import Header from '@/components/Header.vue'; 
-  import github from '../../public/images/github.jpg'
-  import gmail from '../../public/images/gmail.png'
-  import linkedin from '../../public/images/linkedin.png'
-  import phone from '../../public/images/phone.png' 
-  import axios from 'axios';
+  import { onMounted, ref } from 'vue';
+  import Header from '@/components/Header.vue';
+  import github from '../../public/images/github.jpg';
+  import gmail from '../../public/images/gmail.png';
+  import linkedin from '../../public/images/linkedin.png';
+  import phone from '../../public/images/phone.png';
   import emailjs from 'emailjs-com';
   import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
-
+  import 'vue3-toastify/dist/index.css';
+  
   const githubUrl = 'https://github.com/ayoubkhezami';
   const linkedinUrl = 'https://www.linkedin.com/in/khezami-ayoub/';
   const contactEmail = 'khezamiayoub1@gmail.com';
@@ -80,23 +78,46 @@ import 'vue3-toastify/dist/index.css';
   const message = ref('');
   const showForm = ref(false);
   
+  const contacts = [
+    { name: 'GitHub', imgSrc: github, alt: 'GitHub Logo', href: githubUrl, text: githubUrl },
+    { name: 'LinkedIn', imgSrc: linkedin, alt: 'LinkedIn Logo', href: linkedinUrl, text: linkedinUrl },
+    { name: 'Email', imgSrc: gmail, alt: 'Email Logo', href: `mailto:${contactEmail}`, text: contactEmail },
+    { name: 'Phone', imgSrc: phone, alt: 'Phone Logo', href: '#', text: '+216 54 49 75 78' }
+  ];
+  
   const toggleForm = () => {
     showForm.value = !showForm.value;
   };
   
-  const handleSubmit = async () => { 
-    console.log(import.meta.env.SERVICE_ID);
-    console.log(fullname.value,email.value,message.value);
-    const response =await emailjs.send(import.meta.env.VITE_SERVICE_ID,import.meta.env.VITE_TEMPLATE_ID,{name : fullname.value,email:email.value,message:message.value},import.meta.env.VITE_USER_ID);
-    console.log(response); 
-    if(response)
-  {
-  toast.success("Your message is sent successfully ! ", {
-    position: toast.POSITION.TOP_RIGHT,
+  onMounted(() => {
+    toast.warning("The contact form is not working yet! I'm working to fix it, thanks for your visit!", {
+      position: toast.POSITION.TOP_RIGHT,
+    });
   });
-  }
+  
+  const handleSubmit = async () => {
+    try {
+      const response = await emailjs.send(import.meta.env.VITE_SERVICE_ID, import.meta.env.VITE_TEMPLATE_ID, {
+        name: fullname.value,
+        email: email.value,
+        message: message.value
+      }, import.meta.env.VITE_USER_ID);
+      console.log(response);
+      if (response.status === 200) {
+        toast.success("Your message is sent successfully!", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        toggleForm(); // Close form after successful submission
+      }
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      toast.error("Failed to send message. Please try again later.", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
   };
   </script>
+  
   
   <style scoped>
 /* General Styles */
